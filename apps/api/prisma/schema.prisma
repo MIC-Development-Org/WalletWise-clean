@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TxType {
+  EXPENSE
+  INCOME
+}
+
+enum TxSource {
+  MANUAL
+  SMS
+  EMAIL
+  SCAN
+}
+
+enum AccountType {
+  CASH
+  BANK
+  UPI
+  WALLET
+}
+
+enum BudgetPeriod {
+  WEEKLY
+  MONTHLY
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String
+  passwordHash  String
+  cycleStartDay Int            @default(1)
+  createdAt     DateTime       @default(now())
+  accounts      Account[]
+  categories    Category[]
+  transactions  Transaction[]
+  budgets       Budget[]
+  goals         Goal[]
+  refreshTokens RefreshToken[]
+}
+
+/// Refresh tokens are stored as SHA-256 hashes and rotated on every use.
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Account {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  type         AccountType
+  createdAt    DateTime      @default(now())
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+/// userId null means a built-in hostel category shared by everyone.
+model Category {
+  id           String        @id @default(uuid())
+  userId       String?
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  icon         String        @default("tag")
+  isIncome     Boolean       @default(false)
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  /// Generated on the device so a retried sync never creates a duplicate.
+  id          String    @id
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  type        TxType
+  /// Whole paise, never floats.
+  amountPaise Int
+  occurredAt  DateTime
+  note        String    @default("")
+  merchant    String?
+  source      TxSource  @default(MANUAL)
+  refNo       String?
+  last4       String?
+  needsReview Boolean   @default(false)
+  /// Soft delete so deleted entries do not come back through sync.
+  deletedAt   DateTime?
+  /// Bumped by the server on every change, used for sync conflict resolution.
+  version     Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, refNo])
+  @@index([userId, occurredAt])
+  @@index([userId, updatedAt])
+}
+
+model Budget {
+  id         String       @id @default(uuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// null means the overall budget.
+  categoryId String?
+  category   Category?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  period     BudgetPeriod
+  limitPaise Int
+  createdAt  DateTime     @default(now())
+
+  @@index([userId])
+}
+
+model Goal {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  targetPaise Int
+  savedPaise  Int      @default(0)
+  deadline    DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// Bank parsing rules served to the apps, so a new bank is a data update.
+model SmsRuleRow {
+  id      String  @id
+  bank    String
+  sender  String
+  kind    String
+  pattern String
+  active  Boolean @default(true)
+}

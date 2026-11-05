@@ -1,0 +1,5 @@
+node_modules
+dist
+pnpm-lock.yaml
+apps/android/android
+money-tracker-project-plan.md

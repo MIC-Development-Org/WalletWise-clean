@@ -1,0 +1,6 @@
+{
+  "appId": "club.microsoftinnovations.moneytracker",
+  "appName": "Money Tracker",
+  "webDir": "../web/dist",
+  "server": { "androidScheme": "https" }
+}
