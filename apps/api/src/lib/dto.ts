@@ -46,6 +46,7 @@ export const toMeDTO = (u: User): MeDTO => ({
   id: u.id,
   email: u.email,
   name: u.name,
+  photo: u.photo,
   allowancePaise: u.allowancePaise,
   cycleStartDay: u.cycleStartDay,
 });

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { AppDialog } from '@/components/kit';
+import { useNavigate } from 'react-router-dom';
 
 /** Where the Android APK is served from. Set VITE_APK_URL to override, for example with a CDN link. */
 export const APK_URL = (import.meta.env.VITE_APK_URL as string | undefined) || '/downloads/walletwise.apk';
@@ -30,7 +30,7 @@ export function isStandalone(): boolean {
 }
 
 interface InstallApi {
-  /** Starts the native install prompt if the browser offered one, otherwise opens the how-to sheet. */
+  /** Starts the native install prompt if the browser offered one, otherwise opens the install guide for this device. */
   install: () => void;
   installed: boolean;
   platform: Platform;
@@ -39,46 +39,17 @@ interface InstallApi {
 const InstallContext = createContext<InstallApi>({ install: () => {}, installed: false, platform: 'other' });
 export const useInstall = () => useContext(InstallContext);
 
-const STEPS: Record<Platform, { title: string; steps: string[]; note?: string }> = {
-  ios: {
-    title: 'Add to your iPhone or iPad',
-    steps: [
-      'Open this page in Safari.',
-      'Tap the Share button.',
-      'Choose Add to Home Screen, then Add.',
-      'Open WalletWise from your Home Screen.',
-    ],
-    note: 'Notifications on iPhone only work from the Home Screen app.',
-  },
-  'mac-safari': {
-    title: 'Add to your Mac Dock',
-    steps: ['In Safari, open the File menu.', 'Choose Add to Dock.', 'Open WalletWise from your Dock or Launchpad.'],
-    note: 'Needs macOS Sonoma or later with Safari 17 or newer.',
-  },
-  android: {
-    title: 'Install on Android',
-    steps: ['Open the browser menu.', 'Tap Install app (or Add to Home screen).', 'Open WalletWise from your app drawer.'],
-    note: 'Want SMS capture? Use the APK from the download section instead.',
-  },
-  chromium: {
-    title: 'Install on your computer',
-    steps: [
-      'Look for the install icon at the right of the address bar.',
-      'Click it, then choose Install.',
-      'Open WalletWise from your Dock, Start menu or Launchpad.',
-    ],
-    note: 'No install icon? Open the browser menu and choose Cast, save and share, then Install page as app.',
-  },
-  other: {
-    title: 'Install WalletWise',
-    steps: ['Open this page in Chrome, Edge or Safari.', 'Use that browser’s install or Add to Home Screen option.'],
-  },
-};
+/** Which install guide page fits a platform. */
+export function guideFor(p: Platform): 'apple' | 'android' | 'windows' {
+  if (p === 'ios' || p === 'mac-safari') return 'apple';
+  if (p === 'android') return 'android';
+  return 'windows';
+}
 
 export function InstallProvider({ children }: { children: ReactNode }) {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
-  const [help, setHelp] = useState(false);
+  const navigate = useNavigate();
   const platform = useMemo(detectPlatform, []);
 
   useEffect(() => {
@@ -110,21 +81,8 @@ export function InstallProvider({ children }: { children: ReactNode }) {
       });
       return;
     }
-    setHelp(true);
-  }, [deferred, installed]);
+    navigate(`/install/${guideFor(platform)}`);
+  }, [deferred, installed, navigate, platform]);
 
-  const content = STEPS[platform];
-  return (
-    <InstallContext.Provider value={{ install, installed, platform }}>
-      {children}
-      <AppDialog open={help} onClose={() => setHelp(false)} title={content.title}>
-        <ol className="list-decimal space-y-2.5 pl-5 text-sm text-muted-foreground">
-          {content.steps.map((s) => (
-            <li key={s}>{s}</li>
-          ))}
-        </ol>
-        {content.note && <p className="mt-5 rounded-xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">{content.note}</p>}
-      </AppDialog>
-    </InstallContext.Provider>
-  );
+  return <InstallContext.Provider value={{ install, installed, platform }}>{children}</InstallContext.Provider>;
 }

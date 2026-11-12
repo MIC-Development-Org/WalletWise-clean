@@ -37,6 +37,8 @@ export interface Testimonial {
   quote: string;
   name: string;
   role: string;
+  /** Path to a portrait in /public, for example /people/asha.webp. Without it a coloured initial is shown. */
+  photo?: string;
   sample?: boolean;
 }
 

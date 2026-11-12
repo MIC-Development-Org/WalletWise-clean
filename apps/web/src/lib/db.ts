@@ -57,6 +57,8 @@ export interface LocalGoal extends SyncFields {
 export interface Settings {
   onboarded: boolean;
   name: string;
+  /** Profile photo as a small JPEG data URL, or null. Resized on this device before it is stored. */
+  photo?: string | null;
   /** Monthly allowance in paise. Also the default overall budget. */
   allowancePaise: number;
   /** Day of month (1-28) the allowance lands and the budget cycle restarts. */
@@ -66,6 +68,7 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
   onboarded: false,
   name: '',
+  photo: null,
   allowancePaise: 0,
   cycleStartDay: 1,
 };
@@ -155,6 +158,9 @@ export async function saveSettings(patch: Partial<Settings>) {
 
 /** Local settings changed and the server has not seen them yet. */
 export const markSettingsDirty = (dirty = true) => setMeta('settingsDirty', dirty);
+
+/** The photo changed here. Kept separate so changing the allowance never overwrites a photo set elsewhere. */
+export const markPhotoDirty = (dirty = true) => setMeta('photoDirty', dirty);
 
 /** Removes everything stored on this device. */
 export async function wipeLocal() {

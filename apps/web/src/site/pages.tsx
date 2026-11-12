@@ -1,8 +1,9 @@
-import { useEffect, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Minus, ShieldCheck } from 'lucide-react';
+import { Check, Minus } from 'lucide-react';
 import { Reveal } from '../components/Reveal';
-import { useInstall } from '../lib/install';
+import { WorkflowGrid } from '../components/workflow-grid';
+import { PAGES, Seo } from './seo';
 import { Bento } from './Bento';
 import { DeviceShowcase } from './DeviceShowcase';
 import { StackCard, StackCards } from './StackCards';
@@ -10,19 +11,13 @@ import { ApkLink, Container, Heading, pillGhost } from './parts';
 import { AddPhone, BudgetsPhone, HomePhone, ReviewPhone, useSample } from './previews';
 import { ControlCenter, DownloadCards, Faq, FinalCta, Hero, Numbers, Steps, Testimonials } from './sections';
 
-function useTitle(title: string) {
-  useEffect(() => {
-    document.title = title;
-  }, [title]);
-}
-
 /* ---------- Home ---------- */
 
 export function HomePage() {
   const s = useSample();
-  useTitle('WalletWise: know what you can spend today');
   return (
     <>
+      <Seo page={PAGES.home} />
       <Hero s={s} />
       <Numbers />
       <section className="py-16 lg:py-20">
@@ -95,15 +90,9 @@ function FeatureRow({
 
 export function FeaturesPage() {
   const s = useSample();
-  useTitle('Features | WalletWise');
-  const privacy = [
-    ['Read on the phone', 'Messages since your last scan.'],
-    ['Filter by sender', 'Only known bank IDs pass. OTPs and chats never reach the app.'],
-    ['Parse on the device', 'Amount, merchant, last 4 digits and reference.'],
-    ['Send only fields', 'The raw text stays on your phone.'],
-  ];
   return (
     <>
+      <Seo page={PAGES.features} />
       <section className="py-16 lg:py-20">
         <Container>
           <Reveal>
@@ -165,29 +154,7 @@ export function FeaturesPage() {
         </Container>
       </section>
 
-      <section id="privacy" className="scroll-mt-24 py-16 lg:py-20">
-        <Container>
-          <Reveal>
-            <Heading title="Your messages stay on your phone" sub="Reading SMS is sensitive, so the app is built to not need your raw messages at all." />
-          </Reveal>
-          <ol className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {privacy.map(([t, b], i) => (
-              <li key={t}>
-                <Reveal delay={i * 70} className="h-full">
-                  <div className="h-full rounded-3xl bg-surface p-7">
-                    <span className="text-sm text-lime">0{i + 1}</span>
-                    <h3 className="mt-5 text-lg font-medium">{t}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{b}</p>
-                  </div>
-                </Reveal>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-8 flex items-center justify-center gap-2 text-center text-sm text-muted-foreground">
-            <ShieldCheck size={16} className="text-lime" /> Passwords use Argon2id. Deleting your account removes all of your data.
-          </p>
-        </Container>
-      </section>
+      <WorkflowGrid className="py-16 lg:py-24" />
 
       <FinalCta />
     </>
@@ -217,12 +184,11 @@ function Mark({ v }: { v: Cell }) {
 }
 
 export function ComparePage() {
-  useTitle('Compare platforms | WalletWise');
-  const { install, installed } = useInstall();
   const head = 'rounded-2xl border border-line px-5 py-6 text-center';
   const small = 'mt-5 inline-flex w-full items-center justify-center rounded-full border border-line-strong px-4 py-2.5 text-sm font-medium transition-colors hover:bg-surface-3';
   return (
     <>
+      <Seo page={PAGES.compare} />
       <section className="py-16 lg:py-20">
         <Container>
           <Reveal>
@@ -257,9 +223,9 @@ export function ComparePage() {
                       <div className={head}>
                         <p className="text-base font-medium">iPhone and Mac</p>
                         <p className="mt-1 text-sm text-muted-foreground">Add to Home Screen or Dock</p>
-                        <button type="button" onClick={install} className={small}>
-                          {installed ? 'Open WalletWise' : 'Show me how'}
-                        </button>
+                        <Link to="/install/apple" className={small}>
+                          Show me how
+                        </Link>
                       </div>
                     </th>
                     <th scope="col" className="rounded-t-3xl bg-surface px-3 pt-3 pb-4 align-top font-normal">

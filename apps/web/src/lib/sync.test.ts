@@ -4,7 +4,7 @@ import type { AccountDTO, MeDTO, PushResult, SyncChanges, TransactionDTO } from 
 
 /** A scripted server, so we can test exactly how the device reacts to each answer. */
 const server = {
-  me: { id: 'u1', email: 'a@b.co', name: 'A', allowancePaise: 0, cycleStartDay: 1 } as MeDTO,
+  me: { id: 'u1', email: 'a@b.co', name: 'A', photo: null, allowancePaise: 0, cycleStartDay: 1 } as MeDTO,
   accounts: [
     { id: 'srv-cash', name: 'Cash', type: 'CASH' },
     { id: 'srv-upi', name: 'UPI', type: 'UPI' },
@@ -86,7 +86,7 @@ const serverTxn = (id: string, over: Partial<TransactionDTO> = {}): TransactionD
 
 beforeEach(async () => {
   await wipeLocal();
-  server.me = { id: 'u1', email: 'a@b.co', name: 'A', allowancePaise: 0, cycleStartDay: 1 };
+  server.me = { id: 'u1', email: 'a@b.co', name: 'A', photo: null, allowancePaise: 0, cycleStartDay: 1 };
   server.puts = [];
   server.push.mockReset().mockReturnValue(emptyPush());
   server.changes.mockReset().mockReturnValue(emptyChanges());
@@ -252,6 +252,36 @@ describe('identity and settings', () => {
     server.me = { ...server.me, allowancePaise: 600000, cycleStartDay: 10, name: 'Asha' };
     await sync.syncNow();
     expect(await getMeta('settings')).toMatchObject({ onboarded: true, allowancePaise: 600000, cycleStartDay: 10, name: 'Asha' });
+  });
+
+  it('sends a changed photo up, and only when it changed here', async () => {
+    const photo = 'data:image/jpeg;base64,/9j/AAAA';
+    await db.meta.put({ key: 'settings', value: { onboarded: true, name: 'Arjun', photo, allowancePaise: 800000, cycleStartDay: 1 } });
+    await db.meta.put({ key: 'settingsDirty', value: true });
+    await db.meta.put({ key: 'photoDirty', value: true });
+    await sync.syncNow();
+    expect(server.puts[0]).toMatchObject({ photo });
+    expect(await getMeta('photoDirty')).toBe(false);
+
+    // Now an allowance change alone must not send the photo, so it cannot overwrite one set elsewhere.
+    server.puts = [];
+    await db.meta.put({ key: 'settingsDirty', value: true });
+    await sync.syncNow();
+    expect(server.puts[0]).not.toHaveProperty('photo');
+  });
+
+  it('removes the photo on the server when it is cleared here', async () => {
+    await db.meta.put({ key: 'settings', value: { onboarded: true, name: 'Arjun', photo: null, allowancePaise: 800000, cycleStartDay: 1 } });
+    await db.meta.put({ key: 'settingsDirty', value: true });
+    await db.meta.put({ key: 'photoDirty', value: true });
+    await sync.syncNow();
+    expect(server.puts[0]).toHaveProperty('photo', null);
+  });
+
+  it('picks up the name and photo from the account on another device', async () => {
+    server.me = { ...server.me, name: 'Asha', photo: 'data:image/jpeg;base64,/9j/BBBB' };
+    await sync.syncNow();
+    expect(await getMeta('settings')).toMatchObject({ name: 'Asha', photo: 'data:image/jpeg;base64,/9j/BBBB' });
   });
 
   it("never mixes in another account's data left on this device", async () => {

@@ -509,6 +509,37 @@ suite('API with a real database', () => {
       expect((await call('PUT', '/me', { token: u.token, body: { cycleStartDay: 31 } })).status).toBe(400);
     });
 
+    it('stores a small JPEG profile photo, keeps it when other fields change, and removes it with null', async () => {
+      const u = await signUp();
+      const photo = `data:image/jpeg;base64,${'/9j/4AAQSkZJRgABAQ'.padEnd(2000, 'A')}`;
+      const set = await call('PUT', '/me', { token: u.token, body: { photo } });
+      expect(set.status).toBe(200);
+      expect(set.json.photo).toBe(photo);
+
+      // Changing the name alone must not wipe the photo.
+      const rename = await call('PUT', '/me', { token: u.token, body: { name: 'Asha' } });
+      expect(rename.json).toMatchObject({ name: 'Asha', photo });
+      expect((await call('GET', '/me', { token: u.token })).json.photo).toBe(photo);
+
+      const removed = await call('PUT', '/me', { token: u.token, body: { photo: null } });
+      expect(removed.json.photo).toBeNull();
+    });
+
+    it('refuses a photo that is not a small JPEG data URL', async () => {
+      const u = await signUp();
+      const bad = [
+        'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==',
+        'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
+        'https://example.com/me.jpg',
+        `data:image/jpeg;base64,${'A'.repeat(70_001)}`,
+        'data:image/jpeg;base64,<script>',
+      ];
+      for (const photo of bad) {
+        expect((await call('PUT', '/me', { token: u.token, body: { photo } })).status).toBe(400);
+      }
+      expect((await call('GET', '/me', { token: u.token })).json.photo).toBeNull();
+    });
+
     it('exports CSV with spreadsheet formulas defused (W-08)', async () => {
       const u = await signUp();
       await call('POST', '/transactions', { token: u.token, body: txn(u.acc.UPI!, { merchant: '=HYPERLINK("http://evil.example")', note: 'tea, "chai"' }) });

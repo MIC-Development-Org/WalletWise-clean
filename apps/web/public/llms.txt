@@ -1,0 +1,18 @@
+# WalletWise
+
+> WalletWise is a free personal finance app for hostel students in India. It shows what is safe to spend today, tracks expenses, budgets and savings goals, and on Android reads bank SMS on the phone without uploading the message. It is an installable web app (PWA) with an Android APK for SMS capture. Built by Undercut Engineers, Team G, Microsoft Innovations Club, VIT Chennai.
+
+## Pages
+- [Home](https://walletwise.pages.dev/): what the app does and how to install it
+- [Features](https://walletwise.pages.dev/features): safe-to-spend, quick add, budgets and goals, review list, offline sync, privacy
+- [Compare platforms](https://walletwise.pages.dev/compare): what works on Android, iPhone, Mac and Windows
+- [Install on Mac and iPhone](https://walletwise.pages.dev/install/apple): add to Home Screen or Dock from Safari
+- [Install on Windows and Linux](https://walletwise.pages.dev/install/windows): install from Chrome or Edge
+- [Install on Android](https://walletwise.pages.dev/install/android): web app, or APK with SMS capture
+- [Team](https://walletwise.pages.dev/team): the students who build WalletWise
+- [Privacy Policy](https://walletwise.pages.dev/privacy): what is collected and what stays on the phone
+- [Terms of Service](https://walletwise.pages.dev/terms): terms for using the app
+
+## Optional
+- [Full text for LLMs](https://walletwise.pages.dev/llms-full.txt): all page content in one file
+- [Source code](https://github.com/PRODHOSH/WalletWise)

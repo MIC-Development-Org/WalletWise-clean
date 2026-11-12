@@ -16,6 +16,7 @@ interface ViewProps {
   active: NavKey;
   reviewCount: number;
   name: string;
+  photo?: string | null;
   onToggle?: () => void;
   onAdd: () => void;
   className?: string;
@@ -25,7 +26,7 @@ interface ViewProps {
  * The desktop rail. Presentational so the landing page can draw the same sidebar in its laptop preview.
  * Collapses to icons with tooltips, as in the workspace app.
  */
-export function SidebarView({ open, active, reviewCount, name, onToggle, onAdd, className }: ViewProps) {
+export function SidebarView({ open, active, reviewCount, name, photo, onToggle, onAdd, className }: ViewProps) {
   return (
     <aside className={cn('flex h-full shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-300', open ? 'w-64' : 'w-16', className)}>
       <div className={cn('flex h-14 shrink-0 items-center border-b border-border', open ? 'justify-between px-4' : 'justify-center')}>
@@ -96,13 +97,13 @@ export function SidebarView({ open, active, reviewCount, name, onToggle, onAdd, 
       </div>
 
       <div className="shrink-0 border-t border-border p-4">
-        <Account name={name} compact={!open} />
+        <Account name={name} photo={photo} compact={!open} />
       </div>
     </aside>
   );
 }
 
-export function Sidebar({ reviewCount, name, onAdd }: { reviewCount: number; name: string; onAdd: () => void }) {
+export function Sidebar({ reviewCount, name, photo, onAdd }: { reviewCount: number; name: string; photo?: string | null; onAdd: () => void }) {
   const { isOpen, toggle } = useSidebar();
   const { pathname } = useLocation();
   return (
@@ -111,6 +112,7 @@ export function Sidebar({ reviewCount, name, onAdd }: { reviewCount: number; nam
       active={activeKey(pathname)}
       reviewCount={reviewCount}
       name={name}
+      photo={photo}
       onToggle={toggle}
       onAdd={onAdd}
       className="hidden md:flex"

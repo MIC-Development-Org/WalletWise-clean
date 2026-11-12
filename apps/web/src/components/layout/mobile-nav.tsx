@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Account } from './account';
 
 /** Phone menu: the hamburger in the top bar opens a sheet with every page and your account. */
-export function MobileNav({ name, reviewCount }: { name: string; reviewCount: number }) {
+export function MobileNav({ name, photo, reviewCount }: { name: string; photo?: string | null; reviewCount: number }) {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
   const link = (active: boolean) =>
@@ -38,7 +38,7 @@ export function MobileNav({ name, reviewCount }: { name: string; reviewCount: nu
             ))}
           </nav>
           <div className="mt-auto border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-            <Account name={name} onNavigate={() => setOpen(false)} />
+            <Account name={name} photo={photo} onNavigate={() => setOpen(false)} />
           </div>
         </SheetContent>
       </Sheet>

@@ -15,6 +15,7 @@ import {
   db,
   getMeta,
   loadSettings,
+  markPhotoDirty,
   markSettingsDirty,
   saveSettings,
   setMeta,
@@ -287,6 +288,8 @@ async function syncProfile(me: MeDTO) {
   // Set up as a guest, then signed in to a brand new account: send the allowance up.
   if (!dirty && local.onboarded && me.allowancePaise === 0 && local.allowancePaise > 0) dirty = true;
 
+  const photoDirty = (await getMeta<boolean>('photoDirty')) ?? false;
+
   if (dirty) {
     await api<MeDTO>('/api/v1/me', {
       method: 'PUT',
@@ -294,12 +297,19 @@ async function syncProfile(me: MeDTO) {
         ...(local.name && { name: local.name }),
         allowancePaise: local.allowancePaise,
         cycleStartDay: local.cycleStartDay,
+        // Only sent when it changed here, so an allowance change never overwrites a photo set on another device.
+        ...(photoDirty && { photo: local.photo ?? null }),
       }),
     });
     await markSettingsDirty(false);
-  } else if (me.allowancePaise > 0) {
-    // A new device for an existing account picks up where the other one left off.
-    await saveSettings({ name: me.name, allowancePaise: me.allowancePaise, cycleStartDay: me.cycleStartDay, onboarded: true });
+    await markPhotoDirty(false);
+  } else {
+    // Name and photo always follow the account. A new device also picks up the allowance and skips setup.
+    await saveSettings({
+      name: me.name,
+      photo: me.photo,
+      ...(me.allowancePaise > 0 && { allowancePaise: me.allowancePaise, cycleStartDay: me.cycleStartDay, onboarded: true }),
+    });
   }
 }
 

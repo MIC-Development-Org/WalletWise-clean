@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
-import { Download, SlidersHorizontal, Wallet, Zap } from 'lucide-react';
+import { Check, Download, EyeOff, SlidersHorizontal, Wallet, WifiOff, Zap } from 'lucide-react';
 import { Reveal } from '../components/Reveal';
 import type { Snapshot } from '../lib/snapshot';
-import { ActivityPhone, AddPhone, ReviewPhone } from './previews';
+import { AddForm } from '../app/AddSheet';
+import { Float } from '../components/motion';
+import { ReviewCard } from '../screens/Review';
 
 function Card({
   title,
@@ -85,7 +87,18 @@ function Bars({ today }: { today: string }) {
   );
 }
 
+function Chip({ icon, tone, children }: { icon: ReactNode; tone: 'lime' | 'muted' | 'warn'; children: ReactNode }) {
+  const t = tone === 'lime' ? 'border-lime/30 bg-lime/10 text-lime' : tone === 'warn' ? 'border-warn/30 bg-warn/10 text-warn' : 'border-line-strong bg-ink/80 text-muted-foreground';
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap backdrop-blur ${t}`}>
+      {icon}
+      {children}
+    </span>
+  );
+}
+
 export function Bento({ s }: { s: Snapshot }) {
+  const review = s.review[0];
   return (
     <div className="grid gap-4 md:grid-cols-6">
       <Reveal className="md:col-span-2">
@@ -119,21 +132,50 @@ export function Bento({ s }: { s: Snapshot }) {
         <Card
           title="Quick add, even offline"
           body="Entries are saved on your device first and sync when you are back online, without duplicates."
-          panelClass="flex h-80 justify-center pt-8 bg-gradient-to-b from-surface-3 to-surface-2"
-          panel={<AddPhone s={s} scale={0.55} />}
+          panelClass="h-[23rem] bg-gradient-to-b from-surface-3 to-surface-2"
+          panel={
+            <>
+              <div className="absolute top-8 left-1/2 w-[22rem] max-w-[88%] -translate-x-1/2 rounded-2xl border border-border bg-popover p-5 shadow-[0_30px_60px_-20px_rgb(0_0_0/0.8)]" inert aria-hidden="true">
+                <p className="mb-4 text-lg font-semibold">Add transaction</p>
+                <AddForm initialType="EXPENSE" initialAmount="85" onDone={() => {}} />
+              </div>
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-surface-3 to-transparent" />
+              <div className="absolute top-14 left-3 hidden sm:block">
+                <Float amplitude={7} duration={5}>
+                  <Chip icon={<WifiOff size={14} />} tone="muted">Offline</Chip>
+                </Float>
+              </div>
+              <div className="absolute right-3 bottom-16 hidden sm:block">
+                <Float amplitude={8} duration={6} delay={0.8}>
+                  <Chip icon={<Check size={14} />} tone="lime">Saved on this device</Chip>
+                </Float>
+              </div>
+            </>
+          }
         />
       </Reveal>
       <Reveal delay={100} className="md:col-span-3">
         <Card
           title="Anything unsure waits for you"
           body="Captures the app cannot read with confidence go to a review list. Nothing is saved on a guess."
-          panelClass="flex h-80 justify-center gap-4 pt-8 bg-gradient-to-b from-surface-3 to-surface-2"
+          panelClass="h-[23rem] bg-gradient-to-b from-surface-3 to-surface-2"
           panel={
             <>
-              <div className="mt-10 hidden sm:block">
-                <ActivityPhone s={s} scale={0.5} />
+              {review && (
+                <div className="absolute top-14 left-1/2 w-[21rem] max-w-[88%] -translate-x-1/2" inert aria-hidden="true">
+                  <div className="absolute inset-x-5 -top-5 h-24 rounded-2xl border border-border bg-card/60" />
+                  <div className="absolute inset-x-2.5 -top-2.5 h-24 rounded-2xl border border-border bg-card/80" />
+                  <div className="relative shadow-[0_30px_60px_-20px_rgb(0_0_0/0.8)]">
+                    <ReviewCard t={review} />
+                  </div>
+                </div>
+              )}
+              <div className="absolute top-3 left-1/2 -translate-x-1/2">
+                <Float amplitude={4} duration={4}>
+                  <Chip icon={<EyeOff size={14} />} tone="warn">Not counted until you confirm</Chip>
+                </Float>
               </div>
-              <ReviewPhone s={s} scale={0.55} />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface-3 to-transparent" />
             </>
           }
         />

@@ -37,10 +37,10 @@ function toLocalInput(d: Date) {
 const chip = (on: boolean) =>
   cn('rounded-full border px-4 py-2 text-sm transition-colors', on ? 'border-primary bg-primary/10 text-foreground' : 'border-border text-muted-foreground hover:bg-muted');
 
-export function AddForm({ initialType, onDone }: { initialType: 'EXPENSE' | 'INCOME'; onDone: () => void }) {
+export function AddForm({ initialType, onDone, initialAmount = '' }: { initialType: 'EXPENSE' | 'INCOME'; onDone: () => void; initialAmount?: string }) {
   const toast = useToast();
   const [type, setType] = useState(initialType);
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(initialAmount);
   const [touched, setTouched] = useState(false);
   const [categoryId, setCategoryId] = useState(() => (initialType === 'INCOME' ? 'allowance' : remember('ww.lastCategory', 'canteen')));
   const [accountId, setAccountId] = useState<AccountId>(() => remember('ww.lastAccount', 'upi') as AccountId);

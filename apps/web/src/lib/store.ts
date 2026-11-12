@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, loadSettings, markSettingsDirty, saveSettings, wipeLocal, type AccountId, type LocalTransaction, type Settings } from './db';
+import { db, loadSettings, markPhotoDirty, markSettingsDirty, saveSettings, wipeLocal, type AccountId, type LocalTransaction, type Settings } from './db';
 import { category } from './categories';
 import { sampleBudgets, sampleGoals, sampleTransactions } from './sample';
 import { buildSnapshot, type Snapshot } from './snapshot';
@@ -107,6 +107,14 @@ export async function updateAllowance(s: Pick<Settings, 'name' | 'allowancePaise
   await saveSettings({ ...s, name: s.name.trim().slice(0, 40) });
   await markSettingsDirty();
   await setBudget(null, s.allowancePaise);
+}
+
+/** Name and profile photo. Pass `photo` only when it changed: null removes it, a data URL sets it. */
+export async function updateProfile(patch: { name: string; photo?: string | null }) {
+  await saveSettings({ name: patch.name.trim().slice(0, 40), ...(patch.photo !== undefined && { photo: patch.photo }) });
+  await markSettingsDirty();
+  if (patch.photo !== undefined) await markPhotoDirty();
+  requestSync();
 }
 
 /** Adds a month of example spending to the user's own cycle. Their allowance and cycle day are kept. */
