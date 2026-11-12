@@ -32,18 +32,23 @@ enum BudgetPeriod {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  name          String
-  passwordHash  String
-  cycleStartDay Int            @default(1)
-  createdAt     DateTime       @default(now())
-  accounts      Account[]
-  categories    Category[]
-  transactions  Transaction[]
-  budgets       Budget[]
-  goals         Goal[]
-  refreshTokens RefreshToken[]
+  id             String             @id @default(uuid())
+  email          String             @unique
+  name           String
+  passwordHash   String
+  cycleStartDay  Int                @default(1)
+  /// Monthly allowance in paise. Also the default overall budget.
+  allowancePaise Int                @default(0)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @default(now()) @updatedAt
+  accounts       Account[]
+  categories     Category[]
+  transactions   Transaction[]
+  budgets        Budget[]
+  goals          Goal[]
+  refreshTokens  RefreshToken[]
+  pushSubs       PushSubscription[]
+  alertsSent     AlertSent[]
 }
 
 /// Refresh tokens are stored as SHA-256 hashes and rotated on every use.
@@ -123,32 +128,70 @@ model Budget {
   /// null means the overall budget.
   categoryId String?
   category   Category?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  period     BudgetPeriod
+  period     BudgetPeriod @default(MONTHLY)
   limitPaise Int
+  deletedAt  DateTime?
+  /// Bumped on every change. The higher version wins a sync conflict.
+  version    Int          @default(1)
   createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @default(now()) @updatedAt
 
-  @@index([userId])
+  @@index([userId, updatedAt])
 }
 
 model Goal {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   name        String
   targetPaise Int
-  savedPaise  Int      @default(0)
-  deadline    DateTime
-  createdAt   DateTime @default(now())
+  savedPaise  Int       @default(0)
+  deadline    DateTime? @db.Date
+  deletedAt   DateTime?
+  version     Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
 
-  @@index([userId])
+  @@index([userId, updatedAt])
 }
 
 /// Bank parsing rules served to the apps, so a new bank is a data update.
 model SmsRuleRow {
-  id      String  @id
-  bank    String
-  sender  String
-  kind    String
-  pattern String
-  active  Boolean @default(true)
+  id        String   @id
+  bank      String
+  sender    String
+  kind      String
+  pattern   String
+  active    Boolean  @default(true)
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+/// Where to send notifications for a user. One row per browser or device.
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// webpush or fcm
+  kind      String
+  endpoint  String?  @unique
+  p256dh    String?
+  auth      String?
+  token     String?  @unique
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// One row per budget alert already sent, so a job that runs twice never sends twice.
+model AlertSent {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// "overall" or a category id
+  scope      String
+  cycleStart DateTime
+  threshold  Int
+  sentAt     DateTime @default(now())
+
+  @@unique([userId, scope, cycleStart, threshold])
 }

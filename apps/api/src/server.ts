@@ -1,3 +1,6 @@
+// Cycle maths and insights read calendar fields, so the server always runs in UTC and shifts by the user's offset.
+process.env.TZ = 'UTC';
+
 import { PrismaClient } from '@prisma/client';
 import { buildApp } from './app';
 import { loadEnv } from './env';

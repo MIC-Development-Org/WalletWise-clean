@@ -2,6 +2,13 @@ import { z } from 'zod';
 
 export const paise = z.number().int().positive().max(2_000_000_000);
 
+/** Slugs for built-in rows (like "mess") or UUIDs for rows a user creates. */
+export const idSchema = z
+  .string()
+  .min(1)
+  .max(64)
+  .regex(/^[A-Za-z0-9_-]+$/);
+
 export const emailSchema = z.string().trim().toLowerCase().email().max(254);
 export const passwordSchema = z.string().min(10).max(128);
 
@@ -26,8 +33,8 @@ export const createTransactionBody = z.object({
   id: z.string().uuid(),
   type: transactionType,
   amountPaise: paise,
-  categoryId: z.string().uuid().nullable().default(null),
-  accountId: z.string().uuid(),
+  categoryId: idSchema.nullable().default(null),
+  accountId: idSchema,
   occurredAt: z.string().datetime(),
   note: z.string().trim().max(200).default(''),
   merchant: z.string().trim().max(120).nullable().default(null),
