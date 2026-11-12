@@ -1,5 +1,229 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/inter';
+
+/*
+  WalletWise design tokens.
+  Dark first: near-black with a faint green cast, one lime accent taken from the logo.
+  Lime is used for the single most important thing on a screen, never as decoration.
+*/
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+
+  /* Fincash palette: neutral near-black, #171717 cards, one lime accent. */
+  --color-ink: #0a0a0a;
+  --color-surface: #171717;
+  --color-surface-2: #1f1f1f;
+  --color-surface-3: #262626;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-line-strong: rgb(255 255 255 / 0.16);
+
+  --color-fg: #ffffff;
+  --color-faint: #737373;
+
+  --color-lime: #d6ff66;
+  --color-lime-dim: #b3d94f;
+  --color-lime-ink: #0a0a0a;
+
+  --color-warn: #ffb547;
+  --color-danger: #ff6b5e;
+  --color-info: #6cc7ff;
+
+  --radius-card: 1.5rem;
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+
+/*
+  Design system tokens (shadcn naming, as used by the ported components in components/ui).
+  The app is dark only, with lime as the primary colour.
+*/
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root,
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --card: #121212;
+  --card-foreground: #ffffff;
+  --popover: #161616;
+  --popover-foreground: #ffffff;
+  --primary: #d6ff66;
+  --primary-foreground: #0a0a0a;
+  --secondary: #1f1f1f;
+  --secondary-foreground: #ffffff;
+  --muted: #1c1c1c;
+  --muted-foreground: #a1a1a1;
+  --accent: #232323;
+  --accent-foreground: #ffffff;
+  --destructive: #ff6b5e;
+  --destructive-foreground: #ff6b5e;
+  --border: #242424;
+  --input: #2a2a2a;
+  --ring: #d6ff66;
+  /* Validated for dark mode: lightness band, chroma and colour-blind separation. */
+  --chart-1: #68a817;
+  --chart-2: #3b8be0;
+  --chart-3: #c98022;
+  --chart-4: #8c68e0;
+  --chart-5: #d0507e;
+  --radius: 0.5rem;
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #d6ff66;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #1f1f1f;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1f1f1f;
+  --sidebar-ring: #d6ff66;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+}
+
+/* Small helpers from the workspace app. */
+.text-eyebrow { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.safe-top { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+@media (pointer: coarse) {
+  [data-mobile-tap-target] { min-height: 44px; min-width: 44px; }
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  background: var(--color-ink);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-lime);
+  color: var(--color-lime-ink);
+}
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: 3px;
+  }
+}
+
+/* Scroll reveal. Content is visible by default; motion only applies once JS marks the page ready. */
+.js-reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s var(--ease-out-quart),
+    transform 0.7s var(--ease-out-quart);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js-reveal [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes float-a {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes float-b {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(7px); }
+}
+@keyframes grow-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.float-a { animation: float-a 6s ease-in-out infinite; }
+.float-b { animation: float-b 7s ease-in-out infinite; }
+.grow-x { transform-origin: left; animation: grow-x 1.2s var(--ease-out-quart) 0.4s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js-reveal [data-reveal] { opacity: 1; transform: none; transition: none; }
+  .float-a, .float-b, .grow-x { animation: none; }
+}
+
+/* Subtle grid used behind the hero. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+}
+
+/* Native dialog used as a bottom sheet (phones) or centred modal (larger screens). */
+dialog.sheet:modal {
+  overscroll-behavior: contain;
+  animation: sheet-in 0.3s var(--ease-out-quart);
+}
+dialog.sheet::backdrop {
+  background: rgb(0 0 0 / 0.62);
+  backdrop-filter: blur(3px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+@keyframes sheet-in {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  dialog.sheet:modal { animation: none; }
+}
+
+/* Hatched bar used in the bento chart. */
+.hatch {
+  background-image: repeating-linear-gradient(135deg, rgb(214 255 102 / 0.55) 0 2px, transparent 2px 7px);
 }

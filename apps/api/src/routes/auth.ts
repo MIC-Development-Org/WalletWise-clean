@@ -6,8 +6,8 @@ import { REFRESH_TTL_MS, hashToken, newRefreshToken } from '../tokens';
 // Verified against when the email is unknown, so login time does not reveal which emails exist.
 const DUMMY_HASH = await hash('timing-equaliser-not-a-real-password');
 
-export const authRoutes: FastifyPluginAsync = async (app) => {
-  const strict = { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } };
+export const authRoutes: FastifyPluginAsync<{ max?: number }> = async (app, opts) => {
+  const strict = { config: { rateLimit: { max: opts.max ?? 10, timeWindow: '1 minute' } } };
 
   async function issueTokens(userId: string) {
     const { token, hash: tokenHash } = newRefreshToken();
@@ -26,7 +26,15 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
           email: body.email,
           name: body.name,
           passwordHash,
-          accounts: { create: { name: 'Cash', type: 'CASH' } },
+          // One account per way students actually pay, so a capture can name where the money moved.
+          accounts: {
+            create: [
+              { name: 'Cash', type: 'CASH' },
+              { name: 'UPI', type: 'UPI' },
+              { name: 'Bank', type: 'BANK' },
+              { name: 'Wallet', type: 'WALLET' },
+            ],
+          },
         },
       });
       return reply.status(201).send(await issueTokens(user.id));

@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "skills": {
+    "app-store-screenshots": {
+      "source": "ceorkm/aso-shots",
+      "sourceType": "github",
+      "skillPath": "skills/app-store-screenshots/SKILL.md",
+      "computedHash": "4e631c5aa14f8ab5e135b187809fc7d23a5966ee639933bf9e506d5e5930ad65"
+    }
+  }
+}

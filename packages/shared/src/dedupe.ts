@@ -8,7 +8,9 @@ export interface DedupeCandidate {
 
 export type DedupeVerdict = 'DUPLICATE' | 'POSSIBLE' | 'DISTINCT';
 
-const WINDOW_MS = 5 * 60 * 1000;
+/** Two payments with the same amount this close together may be one payment seen twice. */
+export const DEDUPE_WINDOW_MS = 5 * 60 * 1000;
+const WINDOW_MS = DEDUPE_WINDOW_MS;
 
 /**
  * Same payment seen through SMS, email, scan or manual entry.

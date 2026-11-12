@@ -34,5 +34,8 @@ Personal finance PWA for hostel students (Team G, Microsoft Innovations Club, VI
 - Gmail restricted scope stays in test mode for the rollout. Test-mode refresh tokens expire after 7 days, so reconnect prompts are expected.
 - Windows shell note: write multi-line files with the Write tool, not bash heredocs.
 
+## Built so far
+Landing site, dashboard UI (shared components in `apps/web/src/components/ui`), local first storage, the full REST API with a real database, web sync client, and tests (shared, API integration on PostgreSQL, sync client). API integration tests need `TEST_DATABASE_URL`. The server runs with `TZ=UTC` and insights shift by the user's offset.
+
 ## Not built yet
-Budgets, goals, categories seed data, sync worker, push, Gmail, OCR, SMS live listener, review list UI, shadcn/ui components, API integration tests with a real DB, Terraform. See `docs/` for the owner split.
+Background worker (budget alerts, recurring entries), sending push, Gmail, OCR, SMS live listener, Terraform and deploy pipeline, published APK. See `docs/` for the owner split.

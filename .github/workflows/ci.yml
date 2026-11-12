@@ -11,6 +11,22 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    # A real database, so the API integration tests run in CI exactly as they do locally.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: money
+          POSTGRES_PASSWORD: money
+          POSTGRES_DB: money_tracker_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U money"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://money:money@localhost:5432/money_tracker_test
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

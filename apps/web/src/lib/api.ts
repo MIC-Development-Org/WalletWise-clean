@@ -15,6 +15,18 @@ export function clearSession() {
   localStorage.removeItem(KEY);
 }
 
+/** Ends the session on the server too, so the refresh token cannot be used again. */
+export async function logout() {
+  const refreshToken = localStorage.getItem(KEY);
+  clearSession();
+  if (!refreshToken) return;
+  await fetch(`${BASE}/api/v1/auth/logout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
+  }).catch(() => {});
+}
+
 export function hasSession() {
   return accessToken !== null || localStorage.getItem(KEY) !== null;
 }
