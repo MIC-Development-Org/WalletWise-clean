@@ -49,9 +49,9 @@ export function Shell() {
       <ToastProvider>
         <AddSheetContext.Provider value={api}>
           <div className="flex h-dvh w-full overflow-hidden bg-background text-foreground">
-            <Sidebar reviewCount={snap.review.length} name={snap.name} onAdd={() => api.openAdd()} />
+            <Sidebar reviewCount={snap.review.length} name={snap.name} photo={snap.photo} onAdd={() => api.openAdd()} />
             <div className="flex min-w-0 flex-1 flex-col">
-              <Topbar name={snap.name} reviewCount={snap.review.length} transactions={snap.transactions} />
+              <Topbar name={snap.name} photo={snap.photo} reviewCount={snap.review.length} transactions={snap.transactions} />
               <main className="flex-1 overflow-y-auto p-4 pb-32 md:p-8 md:pb-10">
                 <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
                   <Outlet context={snap} />

@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Download, Laptop, Smartphone } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { APK_URL, useInstall } from '../lib/install';
+import { AndroidGlyph, AppleGlyph, WindowsGlyph } from './glyphs';
 
 let apkCheck: Promise<boolean> | null = null;
 
@@ -63,42 +64,28 @@ export function Heading({ title, sub, align = 'center' }: { title: ReactNode; su
   );
 }
 
-const storeBtn =
-  'flex min-w-[12.5rem] items-center gap-3 rounded-xl bg-white px-5 py-2.5 text-left text-black transition-transform hover:-translate-y-0.5 active:translate-y-0';
-
-/** The two real ways in: install the PWA anywhere, or get the Android APK for SMS capture. */
-export function StoreButtons({ className = '' }: { className?: string }) {
-  const { install, installed, platform } = useInstall();
-  const label =
-    platform === 'ios' ? 'iPhone and iPad' : platform === 'mac-safari' ? 'Mac Dock' : platform === 'android' ? 'Android' : 'iPhone, Mac and PC';
+/** The one download action. It takes you to the device picker, or opens the app if it is already installed. */
+export function DownloadButton({ className = '', size = 'lg' }: { className?: string; size?: 'md' | 'lg' }) {
+  const { installed } = useInstall();
   return (
-    <div className={`flex flex-col items-center justify-center gap-3 sm:flex-row ${className}`}>
-      <button type="button" onClick={install} className={storeBtn}>
-        {platform === 'ios' || platform === 'android' ? <Smartphone size={26} /> : <Laptop size={26} />}
-        <span className="leading-tight">
-          <span className="block text-[0.65rem] tracking-wide">{installed ? 'Installed' : 'Install on'}</span>
-          <span className="block text-lg font-semibold">{installed ? 'Open WalletWise' : label}</span>
-        </span>
-      </button>
-      <ApkLink
-        className={storeBtn}
-        pending={
-          <>
-            <Download size={26} />
-            <span className="leading-tight">
-              <span className="block text-[0.65rem] tracking-wide">Android (APK)</span>
-              <span className="block text-lg font-semibold">Publishing soon</span>
-            </span>
-          </>
-        }
-      >
-        <Download size={26} />
-        <span className="leading-tight">
-          <span className="block text-[0.65rem] tracking-wide">Download for</span>
-          <span className="block text-lg font-semibold">Android (APK)</span>
-        </span>
-      </ApkLink>
-    </div>
+    <Link
+      to={installed ? '/app' : '/#download'}
+      className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-lime font-medium text-lime-ink shadow-[0_10px_40px_-12px_rgb(214_255_102/0.55)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_44px_-10px_rgb(214_255_102/0.7)] active:translate-y-0 ${size === 'lg' ? 'px-7 py-4 text-base' : 'px-5 py-3 text-sm'} ${className}`}
+    >
+      <Download size={size === 'lg' ? 19 : 17} className="transition-transform group-hover:translate-y-0.5" />
+      {installed ? 'Open WalletWise' : 'Download the app'}
+    </Link>
+  );
+}
+
+/** A quiet line naming where it runs, so the page does not shout four buttons at once. */
+export function PlatformLine({ className = '' }: { className?: string }) {
+  return (
+    <p className={`flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground ${className}`}>
+      <span className="flex items-center gap-1.5"><AppleGlyph className="h-4 w-4" /> Mac and iPhone</span>
+      <span className="flex items-center gap-1.5"><WindowsGlyph className="h-4 w-4" /> Windows</span>
+      <span className="flex items-center gap-1.5"><AndroidGlyph className="h-4 w-4" /> Android</span>
+    </p>
   );
 }
 

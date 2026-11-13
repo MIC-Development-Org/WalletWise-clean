@@ -207,4 +207,41 @@ The full plan, decisions and test cases are in [`docs/money-tracker-team-plan.pd
 
 ## Team
 
-Team G, Microsoft Innovations Club, VIT Chennai.
+Built by **Undercut Engineers**, Team G of the Microsoft Innovations Club, VIT Chennai.
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/team/prodhosh.jpg" width="120" height="120" alt="Prodhosh VS" /><br />
+      <b>Prodhosh VS</b><br />
+      Team leader
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/team/ashvin.svg" width="120" height="120" alt="Ashvin K S" /><br />
+      <b>Ashvin K S</b><br />
+      Senior member
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/team/harsh.svg" width="120" height="120" alt="Harsh Sharma" /><br />
+      <b>Harsh Sharma</b><br />
+      Senior member
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/team/souptik.svg" width="120" height="120" alt="Souptik Dam" /><br />
+      <b>Souptik Dam</b><br />
+      Senior member
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/team/yashwant.svg" width="120" height="120" alt="Yashwant Gokul P" /><br />
+      <b>Yashwant Gokul P</b><br />
+      Junior member
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/team/yojit.svg" width="120" height="120" alt="Yojit Arora" /><br />
+      <b>Yojit Arora</b><br />
+      Junior member
+    </td>
+  </tr>
+</table>

@@ -42,7 +42,6 @@ function Row({ icon, title, sub, onClick, to, tone }: { icon: ReactNode; title: 
 }
 
 function AllowanceDialog({ s, onClose }: { s: Snapshot; onClose: () => void }) {
-  const [name, setName] = useState(s.name);
   const [amount, setAmount] = useState(String(s.allowancePaise / 100));
   const [day, setDay] = useState(String(Math.min(28, s.cycle.start.getDate())));
   const [touched, setTouched] = useState(false);
@@ -56,11 +55,10 @@ function AllowanceDialog({ s, onClose }: { s: Snapshot; onClose: () => void }) {
           e.preventDefault();
           setTouched(true);
           if (parsed.paise === null) return;
-          await updateAllowance({ name, allowancePaise: parsed.paise, cycleStartDay: Number(day) });
+          await updateAllowance({ name: s.name, allowancePaise: parsed.paise, cycleStartDay: Number(day) });
           onClose();
         }}
       >
-        <Field label="Your name">{(id) => <Input id={id} value={name} maxLength={40} onChange={(e) => setName(e.target.value)} className="h-11 md:h-9" />}</Field>
         <MoneyInput label="Monthly allowance" value={amount} onChange={setAmount} error={touched ? parsed.error : ''} />
         <Field label="Allowance lands on day">
           {(id) => (

@@ -12,7 +12,7 @@ import type { Snapshot } from '@/lib/snapshot';
 import { acceptReview, deleteTransaction, restoreTransaction } from '@/lib/store';
 import { useToast } from '@/lib/toast';
 
-function ReviewCard({ t }: { t: LocalTransaction }) {
+export function ReviewCard({ t }: { t: LocalTransaction }) {
   const toast = useToast();
   const [cat, setCat] = useState(t.categoryId === 'other' ? 'canteen' : t.categoryId);
   return (

@@ -15,8 +15,19 @@ export const budgetPeriod = z.enum(['WEEKLY', 'MONTHLY']);
 
 /* ---------- me ---------- */
 
+/**
+ * Profile photo as a small JPEG data URL. The app resizes it to 256px first, so it is a few tens of
+ * kilobytes. Only JPEG is accepted, and it is only ever shown in an img tag.
+ */
+export const profilePhoto = z
+  .string()
+  .max(70_000)
+  .regex(/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/);
+
 export const meBody = z.object({
   name: z.string().trim().min(1).max(80).optional(),
+  /** null removes the photo. Leaving it out keeps the current one. */
+  photo: profilePhoto.nullable().optional(),
   allowancePaise: money.optional(),
   /** Day of month the allowance lands and the budget cycle restarts. */
   cycleStartDay: z.number().int().min(1).max(28).optional(),
@@ -171,6 +182,7 @@ export interface MeDTO {
   id: string;
   email: string;
   name: string;
+  photo: string | null;
   allowancePaise: number;
   cycleStartDay: number;
 }

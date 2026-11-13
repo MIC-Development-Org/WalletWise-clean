@@ -32,7 +32,7 @@ export default defineConfig({
       },
       workbox: {
         // Never cache API responses in the service worker; offline data lives in IndexedDB.
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallbackDenylist: [/^\/api\//, /\.(txt|xml)$/],
       },
     }),
   ],

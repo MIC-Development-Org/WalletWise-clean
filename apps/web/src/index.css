@@ -158,41 +158,55 @@ body {
   }
 }
 
-/* Scroll reveal. Content is visible by default; motion only applies once JS marks the page ready. */
-.js-reveal [data-reveal] {
+/*
+  Motion system. Content is visible by default. Motion only applies once JS marks the page ready
+  (the js-reveal class), so nothing is ever stuck invisible. Every effect is switched off for people
+  who ask for reduced motion.
+*/
+.js-reveal [data-motion] {
   opacity: 0;
-  transform: translateY(18px);
   transition:
-    opacity 0.7s var(--ease-out-quart),
-    transform 0.7s var(--ease-out-quart);
-  transition-delay: var(--reveal-delay, 0ms);
+    opacity 0.85s var(--ease-out-quart) var(--motion-delay, 0ms),
+    transform 0.85s var(--ease-out-quart) var(--motion-delay, 0ms),
+    filter 0.85s var(--ease-out-quart) var(--motion-delay, 0ms);
+  will-change: opacity, transform;
 }
-.js-reveal [data-reveal].is-in {
+.js-reveal [data-motion='fade-up'] { transform: translateY(var(--motion-distance, 28px)); }
+.js-reveal [data-motion='fade-down'] { transform: translateY(calc(var(--motion-distance, 28px) * -1)); }
+.js-reveal [data-motion='left'] { transform: translateX(calc(var(--motion-distance, 40px) * -1)); }
+.js-reveal [data-motion='right'] { transform: translateX(var(--motion-distance, 40px)); }
+.js-reveal [data-motion='scale'] { transform: scale(0.92) translateY(16px); }
+.js-reveal [data-motion='blur'] { transform: translateY(14px); filter: blur(10px); }
+.js-reveal [data-motion='rise'] { transform: translateY(var(--motion-distance, 90px)) scale(0.97); }
+.js-reveal [data-motion].is-in {
   opacity: 1;
   transform: none;
+  filter: none;
 }
 
-@keyframes float-a {
+/* Idle float for floating chips and devices. */
+@keyframes float-y {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(calc(var(--float-amp, 10px) * -1)); }
 }
-@keyframes float-b {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(7px); }
-}
+.motion-float { animation: float-y var(--float-dur, 6s) ease-in-out var(--float-delay, 0s) infinite; }
+
 @keyframes grow-x {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
-
-.float-a { animation: float-a 6s ease-in-out infinite; }
-.float-b { animation: float-b 7s ease-in-out infinite; }
 .grow-x { transform-origin: left; animation: grow-x 1.2s var(--ease-out-quart) 0.4s both; }
+
+/* Slow drift for the ring decorations. */
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+.motion-orbit { animation: orbit-spin var(--orbit-dur, 60s) linear infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .js-reveal [data-reveal] { opacity: 1; transform: none; transition: none; }
-  .float-a, .float-b, .grow-x { animation: none; }
+  .js-reveal [data-motion] { opacity: 1; transform: none; filter: none; transition: none; }
+  .motion-float, .grow-x, .motion-orbit { animation: none; }
 }
 
 /* Subtle grid used behind the hero. */

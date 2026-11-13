@@ -1,0 +1,40 @@
+# WalletWise (full text)
+
+WalletWise is a free personal finance app for hostel students in India, built by Undercut Engineers, Team G, of the Microsoft Innovations Club at VIT Chennai. Site: https://walletwise.pages.dev
+
+## What it does
+- Shows one number on the home screen: how much is safe to spend today in the current allowance cycle.
+- Quick add for expenses and income in a few seconds. It remembers the last category and account used.
+- Budgets and savings goals, with an activity list that can be searched and filtered.
+- A review list for anything the app is unsure about. Unreadable messages and possible duplicates are never saved or dropped silently.
+- Works offline. Entries are saved on the device and sync when the connection returns. Retrying never creates duplicates.
+- All money is stored as whole paise. Currency is INR only.
+
+## Platforms
+- Android: install the web app, or the APK to enable SMS capture. The APK reads only messages from known bank sender IDs. On Android 13 and later the user allows restricted settings once in app settings.
+- iPhone: iOS does not let any app read SMS, so iPhone uses quick add, bank emails and bill scanning. Install by opening the site in Safari and choosing Add to Home Screen. Notifications on iPhone need the app on the Home Screen.
+- Mac and Windows: install the web app from Safari (Add to Dock) or the install icon in Chrome or Edge.
+
+## Privacy summary
+- Raw SMS text never leaves the phone. Only the amount, merchant, last 4 digits and reference number are sent to the server.
+- OTPs and personal chats are never read.
+- Passwords are hashed with Argon2id. Access tokens last 15 minutes. Refresh tokens rotate and reuse signs the user out.
+- No ads, no selling of data.
+- Full policy: https://walletwise.pages.dev/privacy
+
+## Duplicates
+If a reference number matches, it is the same payment and one is kept. Without a reference, two similar amounts within five minutes are both kept and flagged for the user to decide. Payments are never merged quietly.
+
+## FAQ
+- Is my SMS uploaded anywhere? No. It is parsed on the phone.
+- Can I install it on iPhone or Mac? Yes, as a web app.
+- Why does iPhone not get SMS capture? iOS does not allow it.
+- What if the app cannot read a message? It goes to a review list.
+- Does it work offline? Yes.
+- Why is Android a separate download? Google Play restricts the SMS permission, so SMS capture ships as an APK.
+
+## Team
+Undercut Engineers (Team G), Microsoft Innovations Club, VIT Chennai: Prodhosh VS (team leader), Ashvin K S, Harsh Sharma, Souptik Dam, Yashwant Gokul P, Yojit Arora.
+
+## Terms summary
+WalletWise is a tracking tool, not financial advice. It is a free student project provided as it is. Users keep ownership of their entries. Full terms: https://walletwise.pages.dev/terms

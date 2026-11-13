@@ -35,6 +35,8 @@ model User {
   id             String             @id @default(uuid())
   email          String             @unique
   name           String
+  /// Small JPEG data URL, resized on the device. Shown in an img tag only.
+  photo          String?
   passwordHash   String
   cycleStartDay  Int                @default(1)
   /// Monthly allowance in paise. Also the default overall budget.

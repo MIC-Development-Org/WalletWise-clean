@@ -26,6 +26,7 @@ export interface GoalView extends LocalGoal {
 export interface Snapshot {
   now: Date;
   name: string;
+  photo: string | null;
   allowancePaise: number;
   cycle: Cycle;
   budgetPaise: number;
@@ -118,6 +119,7 @@ export function buildSnapshot({ now, settings, transactions, budgets, goals }: S
   return {
     now,
     name: settings.name,
+    photo: settings.photo ?? null,
     allowancePaise: settings.allowancePaise,
     cycle,
     budgetPaise,

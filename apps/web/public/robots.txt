@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Disallow: /app
+Disallow: /login
+Disallow: /welcome
+Disallow: /api/
+
+# AI and LLM crawlers may read the public site. See /llms.txt for a summary.
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://walletwise.pages.dev/sitemap.xml
